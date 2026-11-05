@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shape Friends – English Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#23264d;--cream:#fff7e8;--blue:#2f6fd6;--pink:#e9488a;--green:#2e9e5b;--orange:#e8681f;--yellow:#ffc83d;--purple:#8a55c9;--sky:#e8f4ff;--red:#d6423a;--line:#f0e3c8}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Fredoka,system-ui,"Segoe UI",sans-serif;background:var(--cream);color:var(--navy);-webkit-user-select:none;user-select:none;touch-action:manipulation;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:var(--navy);color:var(--cream)}
+header h1{margin:0;font-size:clamp(24px,3vw,36px);font-weight:700;display:flex;align-items:center;gap:12px}
+.home-btn{background:var(--yellow);color:var(--navy);font-size:22px;font-weight:600;padding:10px 20px;border-radius:999px;box-shadow:0 4px 0 #b88a12}
+.home-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b88a12}
+.stars{font-size:26px;font-weight:700;background:#2f3468;padding:8px 18px;border-radius:999px;display:flex;align-items:center;gap:8px}
+.stars.pop{animation:pop .45s}
+@keyframes pop{50%{transform:scale(1.35)}}
+main{max-width:1240px;margin:0 auto;padding:24px}
+.view{display:none}
+.view.on{display:block;animation:fadein .35s}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+h2{font-size:clamp(30px,4vw,48px);margin:0 0 8px;font-weight:700}
+.sub{font-size:22px;color:#5b5f86;margin:0 0 20px}
+
+/* Home */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:16px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:12px;padding:32px 20px;border-radius:36px;color:var(--navy);font-size:30px;font-weight:700;box-shadow:0 8px 0 rgba(35,38,77,.18);transition:transform .15s}
+.tile:hover{transform:translateY(-4px) rotate(-1deg)}
+.tile:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(35,38,77,.18)}
+.tile .ic{font-size:84px;line-height:1}
+.tile small{font-size:18px;font-weight:500;color:#3b3f6b}
+.teacher{margin-top:32px;font-size:16px;color:#5b5f86;background:#fff;border:2px dashed var(--line);border-radius:18px;padding:14px 18px}
+
+/* Generic */
+.panel{background:#fff;border:4px solid var(--line);border-radius:32px;padding:20px}
+.big-btn{font-size:26px;font-weight:600;padding:14px 26px;border-radius:999px;color:#fff;background:var(--blue);box-shadow:0 5px 0 #1d4e9e}
+.big-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #1d4e9e}
+.big-btn.pink{background:var(--pink);box-shadow:0 5px 0 #a82c5f}
+.big-btn.green{background:var(--green);box-shadow:0 5px 0 #1c6b3c}
+.big-btn.orange{background:var(--orange);box-shadow:0 5px 0 #a3440e}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.speaker{font-size:30px;background:var(--yellow);border-radius:50%;width:60px;height:60px;box-shadow:0 4px 0 #b88a12;flex:none}
+.speaker:active{transform:translateY(3px);box-shadow:0 1px 0 #b88a12}
+
+/* Build */
+.build-wrap{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start}
+@media (max-width:820px){.build-wrap{grid-template-columns:1fr}.tray{flex-direction:row!important;flex-wrap:wrap;justify-content:center}}
+.stage{background:var(--sky);border-radius:32px;padding:12px;position:relative}
+#friendSvg{width:100%;height:auto;max-height:68vh;display:block;touch-action:none}
+.tray{display:flex;flex-direction:column;gap:16px}
+.tray-item{display:flex;align-items:center;gap:14px;background:#fff;border:4px solid var(--line);border-radius:28px;padding:12px 16px;cursor:grab;touch-action:none;font-size:28px;font-weight:600}
+.tray-item:active{cursor:grabbing}
+.tray-item svg{width:72px;height:72px;flex:none}
+.ghost{position:fixed;width:110px;height:110px;pointer-events:none;z-index:50;transform:translate(-50%,-50%) scale(1.05);filter:drop-shadow(0 8px 6px rgba(0,0,0,.25));transition:opacity .2s}
+.ghost svg{width:100%;height:100%}
+.flash{stroke:#e9488a!important;fill:rgba(233,72,138,.25)!important}
+.slot-empty{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+.progress{font-size:24px;font-weight:600}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.chip{background:#fff;border-radius:999px;padding:8px 16px;font-size:22px;font-weight:600;border:3px solid var(--line)}
+.bounce{animation:bounce .55s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes bounce{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-14px) rotate(2deg)}}
+.blink{animation:blink 3s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+
+/* Hunt */
+.hunt-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.prompt{font-size:clamp(28px,3.6vw,44px);font-weight:700;display:flex;align-items:center;gap:12px}
+.prompt svg{width:60px;height:60px}
+.dots{display:flex;gap:8px}
+.dot{width:26px;height:26px;border-radius:50%;background:#e4dccb}
+.dot.done{background:var(--green)}
+#huntSvg{width:100%;height:auto;border-radius:28px;display:block;background:#fde9c9}
+#huntSvg .obj{cursor:pointer;transition:filter .2s}
+#huntSvg .obj:hover{filter:brightness(1.08)}
+#huntSvg .obj.found{filter:drop-shadow(0 0 10px #ffe066) drop-shadow(0 0 4px #ffe066)}
+.wiggle{animation:wiggle .45s;transform-box:fill-box;transform-origin:center}
+@keyframes wiggle{20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(4deg)}}
+
+/* Art words */
+.word-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px}
+.word-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:4px solid var(--line);border-radius:30px;padding:18px 10px;font-size:30px;font-weight:600;color:var(--navy);transition:transform .15s}
+.word-card:active{transform:scale(.95)}
+.word-card svg{width:120px;height:120px}
+.word-card.right{border-color:var(--green);background:#e6f7ec;animation:pop .45s}
+.word-card.wrong{animation:wiggleBox .45s;border-color:var(--pink)}
+@keyframes wiggleBox{25%{transform:translateX(-10px)}50%{transform:translateX(10px)}75%{transform:translateX(-6px)}}
+.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:18px}
+@media (max-width:640px){.choice-grid{grid-template-columns:1fr 1fr}}
+.choice-grid .word-card svg{width:160px;height:160px}
+.mode-tabs{display:flex;gap:12px;margin:6px 0 20px}
+.mode-tabs button{font-size:24px;font-weight:600;padding:10px 22px;border-radius:999px;background:#fff;border:3px solid var(--line);color:var(--navy)}
+.mode-tabs button.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+
+/* Plurals */
+.rule{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.rule div{background:#fff;border-radius:22px;padding:10px 18px;font-size:22px;border:3px solid var(--line)}
+.rule b{font-size:26px}
+.plural-board{display:grid;grid-template-columns:1fr 1.6fr;gap:22px}
+@media (max-width:760px){.plural-board{grid-template-columns:1fr}}
+.pcard{background:#fff;border:4px solid var(--line);border-radius:32px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:300px;justify-content:center}
+.pics{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-size:84px;line-height:1}
+.pics svg{width:84px;height:84px}
+.pword{font-size:clamp(40px,5vw,64px);font-weight:700}
+.blank{display:inline-block;min-width:1.6em;border-bottom:6px solid var(--orange);color:var(--orange);text-align:center}
+.blank.ok{border-color:var(--green);color:var(--green);animation:pop .45s}
+.ending-btns{display:flex;gap:24px;justify-content:center;margin-top:22px}
+.ending{font-size:56px;font-weight:700;width:180px;height:120px;border-radius:32px;color:#fff;box-shadow:0 7px 0 rgba(0,0,0,.22)}
+.ending:active{transform:translateY(5px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+.ending.s{background:var(--blue)}
+.ending.es{background:var(--pink)}
+.ending.shake{animation:wiggleBox .45s}
+
+/* Celebrate */
+#celebrate{position:fixed;inset:0;background:rgba(35,38,77,.55);display:none;align-items:center;justify-content:center;z-index:100;overflow:hidden}
+#celebrate.on{display:flex}
+.cele-box{background:var(--cream);border-radius:40px;padding:36px 48px;text-align:center;animation:pop .5s;max-width:90vw}
+.cele-box .ic{font-size:110px;line-height:1}
+.cele-box h3{font-size:54px;margin:10px 0 6px}
+.cele-box p{font-size:26px;margin:0 0 22px}
+.confetti{position:absolute;top:-30px;width:14px;height:22px;border-radius:4px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--navy);color:var(--cream);font-size:30px;font-weight:600;padding:12px 28px;border-radius:999px;opacity:0;transition:opacity .25s;z-index:60;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>🔺 Shape Friends!</h1>
+  <div class="row">
+    <div class="stars" id="stars">⭐ <span id="starCount">0</span></div>
+    <button class="home-btn" id="homeBtn">🏠 Home</button>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <h2>Let's play! 🎉</h2>
+    <p class="sub">Choose a game.</p>
+    <div class="tiles">
+      <button class="tile" style="background:#ffe08a" data-go="build"><span class="ic">🧩</span>Build a Friend<small>Drag the shapes!</small></button>
+      <button class="tile" style="background:#cfe5ff" data-go="hunt"><span class="ic">🔍</span>Shape Hunt<small>Find the shapes!</small></button>
+      <button class="tile" style="background:#ffd3e4" data-go="art"><span class="ic">🎨</span>Art Time Words<small>Listen and find!</small></button>
+      <button class="tile" style="background:#cdeed9" data-go="plurals"><span class="ic">🍎🍎</span>One or Many?<small>s or es?</small></button>
+    </div>
+    <p class="teacher">👩‍🏫 Para la profe: en Zoom, al compartir pantalla marca <b>"Compartir sonido"</b> para que los niños escuchen la pronunciación. Toca cualquier figura o dibujo para oír su nombre en inglés.</p>
+  </section>
+
+  <!-- BUILD -->
+  <section class="view" id="v-build">
+    <div class="row" style="justify-content:space-between">
+      <div><h2>Build a Friend 🧩</h2><p class="sub">Drag each shape to its place.</p></div>
+      <div class="row">
+        <span class="progress" id="buildProgress">0 / 12</span>
+        <button class="big-btn orange" id="recolorBtn">🎨 Colors</button>
+        <button class="big-btn green" id="resetBuild">🔄 New friend</button>
+      </div>
+    </div>
+    <div class="build-wrap">
+      <div class="stage">
+        <svg id="friendSvg" viewBox="0 0 400 470" aria-label="Shape friend to build"></svg>
+      </div>
+      <div class="tray" id="tray"></div>
+    </div>
+    <div class="chips" id="buildChips"></div>
+  </section>
+
+  <!-- HUNT -->
+  <section class="view" id="v-hunt">
+    <h2>Shape Hunt 🔍</h2>
+    <div class="hunt-top">
+      <button class="speaker" id="huntSay" aria-label="Listen again">🔊</button>
+      <div class="prompt" id="huntPrompt"></div>
+      <div class="dots" id="huntDots"></div>
+    </div>
+    <svg id="huntSvg" viewBox="0 0 1000 600" aria-label="A room with hidden shapes"></svg>
+  </section>
+
+  <!-- ART -->
+  <section class="view" id="v-art">
+    <h2>Art Time Words 🎨</h2>
+    <div class="mode-tabs">
+      <button id="artLearnTab" class="on">👂 Learn</button>
+      <button id="artPlayTab">🎮 Play</button>
+    </div>
+    <div id="artLearn">
+      <p class="sub">Touch a picture and listen.</p>
+      <div class="word-grid" id="learnGrid"></div>
+    </div>
+    <div id="artPlay" style="display:none">
+      <div class="hunt-top">
+        <button class="speaker" id="artSay" aria-label="Listen again">🔊</button>
+        <div class="prompt" id="artPrompt"></div>
+        <div class="dots" id="artDots"></div>
+      </div>
+      <div class="choice-grid" id="choiceGrid"></div>
+    </div>
+  </section>
+
+  <!-- PLURALS -->
+  <section class="view" id="v-plurals">
+    <h2>One or Many? 🍎🍎</h2>
+    <div class="rule">
+      <div><b style="color:var(--blue)">+ s</b> &nbsp;pen → pens, star → stars</div>
+      <div><b style="color:var(--pink)">+ es</b> &nbsp;after <b>s, x, sh, ch</b>: box → boxes, brush → brushes</div>
+    </div>
+    <div class="row" style="margin-bottom:14px">
+      <button class="speaker" id="plSay" aria-label="Listen again">🔊</button>
+      <div class="dots" id="plDots"></div>
+    </div>
+    <div class="plural-board">
+      <div class="pcard"><div class="pics" id="plOnePic"></div><div class="pword" id="plOneWord"></div></div>
+      <div class="pcard"><div class="pics" id="plManyPic"></div><div class="pword" id="plManyWord"></div></div>
+    </div>
+    <div class="ending-btns">
+      <button class="ending s" data-end="s">+ s</button>
+      <button class="ending es" data-end="es">+ es</button>
+    </div>
+  </section>
+</main>
+
+<div id="celebrate"><div class="cele-box"><div class="ic">🏆</div><h3 id="celeTitle">Great job!</h3><p id="celeText"></p>
+  <div class="row" style="justify-content:center"><button class="big-btn green" id="celeAgain">🔄 Play again</button><button class="big-btn" id="celeHome">🏠 Home</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- Sound ---------- */
+let voice=null;
+function pickVoice(){
+  try{
+    const vs=speechSynthesis.getVoices();
+    const en=vs.filter(v=>/^en[-_]US/i.test(v.lang));
+    const pool=en.length?en:vs.filter(v=>/^en/i.test(v.lang));
+    voice=pool.find(v=>/Samantha|Google US|Jenny|Aria|Ava|Zira/i.test(v.name))||pool[0]||null;
+  }catch(e){}
+}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}
+function speak(text){
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="en-US";u.rate=.82;u.pitch=1.15;
+    if(voice)u.voice=voice;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+let actx=null;
+function ac(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();}catch(e){}return actx;}
+function tone(freqs,dur,type,vol){
+  const a=ac();if(!a)return;
+  freqs.forEach((f,i)=>{
+    const o=a.createOscillator(),g=a.createGain();
+    o.type=type||"sine";o.frequency.value=f;
+    const t=a.currentTime+i*dur;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol||.18,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+dur*1.6);
+    o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur*1.7);
+  });
+}
+const ding=()=>tone([660,990],.12,"triangle");
+const fanfare=()=>tone([523,659,784,1047],.14,"triangle",.2);
+function boing(){
+  const a=ac();if(!a)return;
+  const o=a.createOscillator(),g=a.createGain();o.type="square";
+  const t=a.currentTime;o.frequency.setValueAtTime(320,t);o.frequency.exponentialRampToValueAtTime(110,t+.3);
+  g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);
+  o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.36);
+}
+
+/* ---------- Stars ---------- */
+let stars=0;
+try{stars=parseInt(localStorage.getItem("shapeStars")||"0",10)||0;}catch(e){}
+const starEl=document.getElementById("stars"),starCount=document.getElementById("starCount");
+starCount.textContent=stars;
+function addStar(){
+  stars++;starCount.textContent=stars;
+  starEl.classList.remove("pop");void starEl.offsetWidth;starEl.classList.add("pop");
+  try{localStorage.setItem("shapeStars",stars);}catch(e){}
+}
+const toastEl=document.getElementById("toast");let toastT;
+function toast(t){toastEl.textContent=t;toastEl.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove("on"),1500);}
+
+/* ---------- Celebrate ---------- */
+const cele=document.getElementById("celebrate");let celeAgainFn=null;
+function celebrate(title,text,again){
+  document.getElementById("celeTitle").textContent=title;
+  document.getElementById("celeText").textContent=text;
+  celeAgainFn=again;cele.classList.add("on");fanfare();
+  const colors=["#ffc83d","#e9488a","#2f6fd6","#2e9e5b","#e8681f","#8a55c9"];
+  for(let i=0;i<70;i++){
+    const c=document.createElement("div");c.className="confetti";
+    c.style.left=Math.random()*100+"vw";c.style.background=colors[i%colors.length];
+    c.style.animationDuration=(1.8+Math.random()*1.8)+"s";c.style.animationDelay=(Math.random()*.6)+"s";
+    cele.appendChild(c);setTimeout(()=>c.remove(),4500);
+  }
+}
+document.getElementById("celeAgain").onclick=()=>{cele.classList.remove("on");if(celeAgainFn)celeAgainFn();};
+document.getElementById("celeHome").onclick=()=>{cele.classList.remove("on");go("home");};
+
+/* ---------- Shapes ---------- */
+const UNIT={
+  circle:'<circle cx="50" cy="50" r="47"/>',
+  square:'<rect x="4" y="4" width="92" height="92" rx="6"/>',
+  triangle:'<polygon points="50,5 96,93 4,93" stroke-linejoin="round"/>',
+  heart:'<path d="M50 92 C22 70 4 52 4 32 C4 16 16 6 30 6 C40 6 47 12 50 21 C53 12 60 6 70 6 C84 6 96 16 96 32 C96 52 78 70 50 92 Z" stroke-linejoin="round"/>'
+};
+const SHAPE_COLOR={triangle:"#e8681f",square:"#2f6fd6",circle:"#ffc83d",heart:"#e9488a"};
+const PLURAL={triangle:"triangles",square:"squares",circle:"circles",heart:"hearts"};
+function shapeG(type,x,y,s,fill,extra){
+  const sw=3.2*100/s;
+  return `<g transform="translate(${x} ${y}) scale(${s/100})" fill="${fill}" stroke="#23264d" stroke-width="${sw}" ${extra||""}>${UNIT[type]}</g>`;
+}
+function iconSVG(type,fill){return `<svg viewBox="-4 -4 108 108" aria-hidden="true">${shapeG(type,0,0,100,fill||SHAPE_COLOR[type])}</svg>`;}
+
+/* ---------- Router ---------- */
+const views=["home","build","hunt","art","plurals"];
+function go(name){location.hash=name==="home"?"":name;show();}
+function show(){
+  let h=(location.hash||"").replace("#","");if(!views.includes(h))h="home";
+  views.forEach(v=>document.getElementById("v-"+v).classList.toggle("on",v===h));
+  try{speechSynthesis.cancel();}catch(e){}
+  if(h==="hunt")startHunt();
+  if(h==="art")setArtMode("learn");
+  if(h==="plurals")startPlurals();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",show);
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ac();go(b.dataset.go);}));
+document.getElementById("homeBtn").onclick=()=>go("home");
+
+/* =====================================================
+   1. BUILD A FRIEND
+   ===================================================== */
+const SLOT_DEF=[
+  {id:"body",type:"square",x:125,y:240,s:150,c:"#2f6fd6",part:"body"},
+  {id:"armL",type:"square",x:62,y:258,s:58,c:"#2e9e5b",part:"arm"},
+  {id:"armR",type:"square",x:280,y:258,s:58,c:"#2e9e5b",part:"arm"},
+  {id:"footL",type:"circle",x:138,y:396,s:58,c:"#8a55c9",part:"foot"},
+  {id:"footR",type:"circle",x:204,y:396,s:58,c:"#8a55c9",part:"foot"},
+  {id:"head",type:"circle",x:130,y:96,s:140,c:"#ffc83d",part:"head"},
+  {id:"hat",type:"triangle",x:150,y:8,s:100,c:"#e8681f",part:"hat"},
+  {id:"eyeL",type:"circle",x:158,y:134,s:32,c:"#ffffff",part:"eye"},
+  {id:"eyeR",type:"circle",x:210,y:134,s:32,c:"#ffffff",part:"eye"},
+  {id:"nose",type:"triangle",x:187,y:164,s:26,c:"#e8681f",part:"nose"},
+  {id:"mouth",type:"heart",x:181,y:194,s:38,c:"#e9488a",part:"mouth"},
+  {id:"chest",type:"heart",x:172,y:285,s:56,c:"#d6423a",part:"heart"}
+];
+const PALETTE=["#2f6fd6","#2e9e5b","#8a55c9","#ffc83d","#e8681f","#e9488a","#d6423a","#33b5c9"];
+let slots=[];let buildDone=false;
+const fsvg=document.getElementById("friendSvg");
+function resetBuild(){slots=SLOT_DEF.map(s=>Object.assign({filled:false},s));buildDone=false;renderFriend();}
+function renderFriend(){
+  let filled="",empty="";
+  slots.forEach(s=>{
+    if(s.filled)filled+=shapeG(s.type,s.x,s.y,s.s,s.c,`data-slot="${s.id}" class="part"`);
+    else empty+=`<g class="slot-empty" data-slot="${s.id}" data-type="${s.type}" style="cursor:pointer" transform="translate(${s.x} ${s.y}) scale(${s.s/100})" fill="rgba(255,255,255,.55)" stroke="#5b5f86" stroke-width="${4*100/s.s}" stroke-dasharray="${9*100/s.s} ${7*100/s.s}">${UNIT[s.type]}</g>`;
+  });
+  let extras="";
+  if(buildDone){
+    extras=`<g class="blink"><circle cx="175" cy="151" r="6" fill="#23264d"/><circle cx="227" cy="151" r="6" fill="#23264d"/></g>`;
+  }
+  fsvg.innerHTML=`<ellipse cx="200" cy="458" rx="120" ry="10" fill="#c9dcf2"/><g id="friendG" class="${buildDone?"bounce":""}">${filled}${extras}</g>${empty}`;
+  const n=slots.filter(s=>s.filled).length;
+  document.getElementById("buildProgress").textContent=`${n} / ${slots.length}`;
+  const chips=document.getElementById("buildChips");
+  if(buildDone){
+    const cnt={};slots.forEach(s=>cnt[s.type]=(cnt[s.type]||0)+1);
+    chips.innerHTML=Object.keys(cnt).map(t=>`<span class="chip" data-say="${cnt[t]} ${PLURAL[t]}">${cnt[t]} ${PLURAL[t]}</span>`).join("");
+    chips.querySelectorAll("[data-say]").forEach(c=>c.onclick=()=>speak(c.dataset.say));
+  }else chips.innerHTML="";
+}
+fsvg.addEventListener("click",e=>{
+  const g=e.target.closest(".slot-empty");
+  if(g&&!drag){speak(g.dataset.type);}
+});
+// tray
+const tray=document.getElementById("tray");
+["triangle","square","circle","heart"].forEach(t=>{
+  const d=document.createElement("div");d.className="tray-item";d.dataset.type=t;
+  d.innerHTML=iconSVG(t)+`<span>${t}</span>`;
+  tray.appendChild(d);
+  d.addEventListener("pointerdown",startDrag);
+});
+let drag=null;
+function startDrag(e){
+  e.preventDefault();ac();
+  const t=e.currentTarget.dataset.type;speak(t);
+  const gh=document.createElement("div");gh.className="ghost";gh.innerHTML=iconSVG(t);
+  document.body.appendChild(gh);
+  drag={type:t,ghost:gh,sx:e.clientX,sy:e.clientY,moved:false};
+  moveGhost(e);
+  window.addEventListener("pointermove",moveGhost);
+  window.addEventListener("pointerup",endDrag,{once:true});
+  window.addEventListener("pointercancel",cancelDrag,{once:true});
+}
+function moveGhost(e){
+  if(!drag)return;
+  drag.ghost.style.left=e.clientX+"px";drag.ghost.style.top=e.clientY+"px";
+  if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>12)drag.moved=true;
+}
+function cancelDrag(){if(drag){drag.ghost.remove();drag=null;}window.removeEventListener("pointermove",moveGhost);}
+function endDrag(e){
+  window.removeEventListener("pointermove",moveGhost);
+  window.removeEventListener("pointercancel",cancelDrag);
+  if(!drag)return;
+  const d=drag;drag=null;
+  if(!d.moved||buildDone){d.ghost.remove();return;}
+  let p;
+  try{const pt=fsvg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;p=pt.matrixTransform(fsvg.getScreenCTM().inverse());}catch(err){d.ghost.remove();return;}
+  const cands=slots.filter(s=>!s.filled).map(s=>{
+    const cx=s.x+s.s/2,cy=s.y+s.s/2;return {s,dist:Math.hypot(p.x-cx,p.y-cy),tol:Math.max(s.s/2,42)};
+  }).filter(c=>c.dist<=c.tol).sort((a,b)=>a.dist-b.dist);
+  if(!cands.length){flyBack(d.ghost);return;}
+  const match=cands.find(c=>c.s.type===d.type);
+  if(match){
+    d.ghost.remove();match.s.filled=true;ding();addStar();
+    const left=slots.filter(s=>!s.filled).length;
+    if(left===0){
+      buildDone=true;renderFriend();
+      speak("Hooray! This is my shape friend! The head is a circle. The body is a square. The hat is a triangle. The mouth is a heart!");
+      setTimeout(()=>celebrate("Hooray! 🎉","This is my shape friend!",resetBuild),2600);
+    }else{
+      renderFriend();
+      speak(`${cap(d.type)}! Great job!`);
+    }
+  }else{
+    boing();speak(`Oops! Find the ${cands[0].s.type}!`);flyBack(d.ghost);
+    const g=fsvg.querySelector(`[data-slot="${cands[0].s.id}"]`);
+    if(g){g.classList.add("flash");setTimeout(()=>g.classList.remove("flash"),700);}
+  }
+}
+function flyBack(gh){gh.style.opacity="0";setTimeout(()=>gh.remove(),220);}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+document.getElementById("resetBuild").onclick=()=>{resetBuild();speak("Let's build a new friend!");};
+document.getElementById("recolorBtn").onclick=()=>{
+  const groups={};
+  slots.forEach(s=>{if(s.part==="eye")return;if(!groups[s.part])groups[s.part]=PALETTE[Math.floor(Math.random()*PALETTE.length)];s.c=groups[s.part];});
+  renderFriend();ding();
+};
+resetBuild();
+
+/* =====================================================
+   2. SHAPE HUNT
+   ===================================================== */
+const hsvg=document.getElementById("huntSvg");
+const heartPath=(x,y,s,fill,stroke)=>`<g transform="translate(${x} ${y}) scale(${s/100})" fill="${fill}" stroke="${stroke||"#23264d"}" stroke-width="${4*100/s}">${UNIT.heart}</g>`;
+const SCENE_DECOR=`
+<rect x="0" y="0" width="1000" height="440" fill="#fde9c9"/>
+<rect x="0" y="440" width="1000" height="160" fill="#e7bf8f"/>
+<rect x="0" y="432" width="1000" height="12" fill="#c99a68"/>
+<line x1="300" y1="40" x2="450" y2="40" stroke="#8a5a3c" stroke-width="4"/>
+<rect x="400" y="330" width="260" height="18" rx="4" fill="#8a5a3c"/>
+<rect x="415" y="346" width="16" height="100" fill="#8a5a3c"/><rect x="629" y="346" width="16" height="100" fill="#8a5a3c"/>
+<rect x="50" y="280" width="200" height="140" rx="22" fill="#7cc4a4"/>
+<rect x="38" y="400" width="224" height="50" rx="16" fill="#5aa888"/>
+<rect x="56" y="448" width="16" height="40" fill="#3f7d63"/><rect x="228" y="448" width="16" height="40" fill="#3f7d63"/>
+<path d="M905 298 Q870 380 815 452" stroke="#23264d" stroke-width="3" fill="none"/>`;
+const HUNT_OBJ=[
+  {t:"square",svg:`<rect x="80" y="60" width="170" height="170" fill="#bfe3ff" stroke="#8a5a3c" stroke-width="10"/><line x1="165" y1="60" x2="165" y2="230" stroke="#8a5a3c" stroke-width="8"/><line x1="80" y1="145" x2="250" y2="145" stroke="#8a5a3c" stroke-width="8"/>`},
+  {t:"circle",svg:`<circle cx="208" cy="102" r="26" fill="#ffc83d" stroke="#e8a317" stroke-width="4"/>`},
+  {t:"triangle",svg:`<polygon points="330,42 420,42 375,128" fill="#e9488a" stroke="#23264d" stroke-width="4" stroke-linejoin="round"/>`},
+  {t:"circle",svg:`<circle cx="545" cy="125" r="60" fill="#ffffff" stroke="#23264d" stroke-width="8"/><line x1="545" y1="125" x2="545" y2="85" stroke="#23264d" stroke-width="6" stroke-linecap="round"/><line x1="545" y1="125" x2="572" y2="138" stroke="#23264d" stroke-width="6" stroke-linecap="round"/><circle cx="545" cy="125" r="6" fill="#23264d"/>`},
+  {t:"square",svg:`<rect x="690" y="60" width="135" height="135" fill="#c47b3d" stroke="#23264d" stroke-width="4"/><rect x="705" y="75" width="105" height="105" fill="#a8e6a1"/><path d="M712 172 L745 120 L770 150 L785 132 L805 172 Z" fill="#2e9e5b"/>`},
+  {t:"heart",svg:heartPath(295,185,90,"#e9488a")},
+  {t:"heart",svg:heartPath(858,205,95,"#d6423a")},
+  {t:"triangle",svg:`<polygon points="432,326 512,326 472,248" fill="#ffcf66" stroke="#e08a2c" stroke-width="6" stroke-linejoin="round"/>`},
+  {t:"triangle",svg:`<polygon points="560,326 622,326 591,236" fill="#2f6fd6" stroke="#23264d" stroke-width="4" stroke-linejoin="round"/><circle cx="591" cy="232" r="11" fill="#ffc83d" stroke="#23264d" stroke-width="3"/>`},
+  {t:"heart",svg:heartPath(108,296,88,"#8a55c9")},
+  {t:"circle",svg:`<circle cx="500" cy="528" r="46" fill="#d6423a" stroke="#23264d" stroke-width="4"/><path d="M458 515 Q500 540 542 515" stroke="#ffffff" stroke-width="9" fill="none"/>`},
+  {t:"square",svg:`<rect x="300" y="492" width="78" height="78" rx="4" fill="#ffc83d" stroke="#b07a00" stroke-width="5"/><text x="339" y="547" text-anchor="middle" font-size="48" font-weight="700" fill="#b07a00" font-family="Fredoka, sans-serif">A</text>`},
+  {t:"square",svg:`<rect x="760" y="450" width="112" height="112" fill="#2e9e5b" stroke="#23264d" stroke-width="4"/><rect x="806" y="450" width="20" height="112" fill="#ffc83d"/><rect x="760" y="496" width="112" height="20" fill="#ffc83d"/>`}
+];
+const HUNT_ORDER=["circle","square","triangle","heart"];
+const NUMW=["zero","one","two","three","four","five"];
+let hunt={round:0,found:new Set()};
+function huntNeed(){return HUNT_OBJ.filter(o=>o.t===HUNT_ORDER[hunt.round]).length;}
+function startHunt(){hunt={round:0,found:new Set()};drawHunt();promptHunt();}
+function drawHunt(){
+  hsvg.innerHTML=SCENE_DECOR+HUNT_OBJ.map((o,i)=>`<g class="obj${hunt.found.has(i)?" found":""}" data-i="${i}">${o.svg}</g>`).join("");
+  hsvg.querySelectorAll(".obj").forEach(g=>g.addEventListener("click",huntClick));
+  hunt.found.forEach(i=>markFound(i));
+}
+function promptHunt(){
+  const t=HUNT_ORDER[hunt.round],n=huntNeed();
+  document.getElementById("huntPrompt").innerHTML=`${iconSVG(t)} Find ${n} ${PLURAL[t]}!`;
+  const got=[...hunt.found].filter(i=>HUNT_OBJ[i].t===t).length;
+  document.getElementById("huntDots").innerHTML=Array.from({length:n},(_,k)=>`<span class="dot${k<got?" done":""}"></span>`).join("");
+  speak(`Find ${n} ${PLURAL[t]}!`);
+}
+document.getElementById("huntSay").onclick=()=>{const t=HUNT_ORDER[hunt.round];speak(`Find ${huntNeed()} ${PLURAL[t]}!`);};
+function markFound(i){
+  const g=hsvg.querySelector(`[data-i="${i}"]`);if(!g)return;
+  g.classList.add("found");
+  if(g.querySelector(".check"))return;
+  const b=g.getBBox();
+  g.insertAdjacentHTML("beforeend",`<g class="check"><circle cx="${b.x+b.width}" cy="${b.y}" r="20" fill="#2e9e5b" stroke="#fff" stroke-width="4"/><path d="M${b.x+b.width-9} ${b.y} l6 7 l12 -13" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`);
+}
+function huntClick(e){
+  ac();
+  const g=e.currentTarget,i=+g.dataset.i,o=HUNT_OBJ[i],want=HUNT_ORDER[hunt.round];
+  if(hunt.found.has(i)){speak(o.t);return;}
+  if(o.t===want){
+    hunt.found.add(i);markFound(i);ding();addStar();
+    const got=[...hunt.found].filter(k=>HUNT_OBJ[k].t===want).length,n=huntNeed();
+    document.getElementById("huntDots").innerHTML=Array.from({length:n},(_,k)=>`<span class="dot${k<got?" done":""}"></span>`).join("");
+    speak(`${cap(NUMW[got])} ${got===1?want:PLURAL[want]}!`);
+    if(got===n){
+      setTimeout(()=>{
+        hunt.round++;
+        if(hunt.round>=HUNT_ORDER.length){celebrate("You found them all! 🔍","Circles, squares, triangles and hearts!",startHunt);}
+        else{toast("⭐ Super!");promptHunt();}
+      },1500);
+    }
+  }else{
+    boing();g.classList.remove("wiggle");void g.getBBox();g.classList.add("wiggle");
+    setTimeout(()=>g.classList.remove("wiggle"),500);
+    speak(`That's a ${o.t}!`);
+  }
+}
+
+/* =====================================================
+   3. ART TIME WORDS
+   ===================================================== */
+const ART=[
+  {w:"pen",say:"It's a pen.",svg:`<g transform="rotate(-35 50 50)"><rect x="42" y="8" width="16" height="64" rx="4" fill="#2f6fd6" stroke="#23264d" stroke-width="3"/><rect x="42" y="8" width="16" height="12" fill="#23264d"/><polygon points="42,72 58,72 50,92" fill="#f3d7a8" stroke="#23264d" stroke-width="3" stroke-linejoin="round"/><polygon points="47.5,84 52.5,84 50,92" fill="#23264d"/></g>`},
+  {w:"brush",say:"It's a brush.",svg:`<g transform="rotate(-35 50 50)"><rect x="45" y="4" width="10" height="56" rx="4" fill="#c47b3d" stroke="#23264d" stroke-width="3"/><rect x="42" y="58" width="16" height="11" fill="#b8bcc8" stroke="#23264d" stroke-width="3"/><path d="M42 69 Q50 100 58 69 Z" fill="#e9488a" stroke="#23264d" stroke-width="3"/></g>`},
+  {w:"eraser",say:"It's an eraser.",svg:`<rect x="10" y="33" width="80" height="36" rx="10" fill="#f6a5c4" stroke="#23264d" stroke-width="3"/><rect x="10" y="33" width="32" height="36" rx="10" fill="#2f6fd6" stroke="#23264d" stroke-width="3"/>`},
+  {w:"paper",say:"It's paper.",svg:`<rect x="22" y="8" width="56" height="82" rx="4" fill="#ffffff" stroke="#23264d" stroke-width="3"/><line x1="32" y1="28" x2="68" y2="28" stroke="#9ccbf3" stroke-width="4"/><line x1="32" y1="42" x2="68" y2="42" stroke="#9ccbf3" stroke-width="4"/><line x1="32" y1="56" x2="68" y2="56" stroke="#9ccbf3" stroke-width="4"/><line x1="32" y1="70" x2="56" y2="70" stroke="#9ccbf3" stroke-width="4"/>`},
+  {w:"glitter",say:"It's glitter.",svg:`<rect x="30" y="36" width="40" height="54" rx="8" fill="#ffd6e8" stroke="#23264d" stroke-width="3"/><rect x="33" y="25" width="34" height="13" rx="3" fill="#e9488a" stroke="#23264d" stroke-width="3"/><circle cx="42" cy="60" r="3" fill="#e9488a"/><circle cx="56" cy="72" r="3" fill="#2f6fd6"/><circle cx="50" cy="52" r="3" fill="#ffc83d"/><circle cx="60" cy="58" r="2.5" fill="#2e9e5b"/><circle cx="44" cy="78" r="2.5" fill="#8a55c9"/><polygon points="20,10 23,18 31,20 23,22 20,30 17,22 9,20 17,18" fill="#ffc83d"/><polygon points="80,8 82,14 88,16 82,18 80,24 78,18 72,16 78,14" fill="#ffc83d"/><polygon points="84,40 86,45 91,47 86,49 84,54 82,49 77,47 82,45" fill="#e9488a"/>`},
+  {w:"paint",say:"It's paint.",svg:`<path d="M50 12 C20 12 6 34 8 54 C10 77 33 92 52 88 C63 86 60 74 68 72 C80 70 94 65 94 48 C94 26 75 12 50 12 Z" fill="#f3d7a8" stroke="#23264d" stroke-width="3"/><circle cx="30" cy="40" r="8" fill="#d6423a"/><circle cx="50" cy="28" r="8" fill="#ffc83d"/><circle cx="72" cy="36" r="8" fill="#2f6fd6"/><circle cx="28" cy="64" r="8" fill="#2e9e5b"/><circle cx="72" cy="56" r="6" fill="#fde9c9" stroke="#23264d" stroke-width="3"/>`}
+];
+const artSVG=a=>`<svg viewBox="0 0 100 100" aria-hidden="true">${a.svg}</svg>`;
+const learnGrid=document.getElementById("learnGrid");
+learnGrid.innerHTML=ART.map((a,i)=>`<button class="word-card" data-i="${i}">${artSVG(a)}${a.w}</button>`).join("");
+learnGrid.querySelectorAll(".word-card").forEach(b=>b.onclick=()=>{
+  ac();const a=ART[+b.dataset.i];speak(`${a.w}. ${a.say}`);
+  b.classList.remove("right");void b.offsetWidth;b.classList.add("right");setTimeout(()=>b.classList.remove("right"),600);
+});
+const ART_ROUNDS=8;let art={round:0,target:null,locked:false};
+function setArtMode(m){
+  document.getElementById("artLearnTab").classList.toggle("on",m==="learn");
+  document.getElementById("artPlayTab").classList.toggle("on",m==="play");
+  document.getElementById("artLearn").style.display=m==="learn"?"":"none";
+  document.getElementById("artPlay").style.display=m==="play"?"":"none";
+  if(m==="play")startArt();
+}
+document.getElementById("artLearnTab").onclick=()=>setArtMode("learn");
+document.getElementById("artPlayTab").onclick=()=>{ac();setArtMode("play");};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startArt(){art={round:0,target:null,locked:false,last:null};nextArt();}
+function nextArt(){
+  art.locked=false;
+  let pool=ART.filter(a=>a!==art.last);
+  const target=pool[Math.floor(Math.random()*pool.length)];art.target=target;art.last=target;
+  const opts=shuffle([target,...shuffle(ART.filter(a=>a!==target)).slice(0,2)]);
+  document.getElementById("artPrompt").textContent=`Find the ${target.w}!`;
+  document.getElementById("artDots").innerHTML=Array.from({length:ART_ROUNDS},(_,k)=>`<span class="dot${k<art.round?" done":""}"></span>`).join("");
+  const cg=document.getElementById("choiceGrid");
+  cg.innerHTML=opts.map(a=>`<button class="word-card" data-w="${a.w}">${artSVG(a)}<span>&nbsp;</span></button>`).join("");
+  cg.querySelectorAll(".word-card").forEach(b=>b.onclick=()=>artPick(b));
+  speak(`Find the ${target.w}!`);
+}
+document.getElementById("artSay").onclick=()=>{if(art.target)speak(`Find the ${art.target.w}!`);};
+function artPick(b){
+  if(art.locked)return;
+  const a=ART.find(x=>x.w===b.dataset.w);
+  if(a===art.target){
+    art.locked=true;b.classList.add("right");b.querySelector("span").textContent=a.w;ding();addStar();
+    speak(`Yes! ${a.say}`);art.round++;
+    setTimeout(()=>{if(art.round>=ART_ROUNDS)celebrate("Art star! 🎨","You know your art words!",startArt);else nextArt();},1700);
+  }else{
+    b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");b.querySelector("span").textContent=a.w;boing();
+    speak(`No. ${a.say} Try again!`);
+  }
+}
+
+/* =====================================================
+   4. PLURALS s / es
+   ===================================================== */
+const shapePic=t=>`<svg viewBox="-4 -4 108 108" aria-hidden="true">${shapeG(t,0,0,100,SHAPE_COLOR[t])}</svg>`;
+const PL_S=[
+  {w:"pen",pic:"🖊️"},{w:"book",pic:"📕"},{w:"star",pic:"⭐"},{w:"cat",pic:"🐱"},
+  {w:"heart",pic:shapePic("heart")},{w:"circle",pic:shapePic("circle")},{w:"square",pic:shapePic("square")},{w:"triangle",pic:shapePic("triangle")}
+].map(o=>Object.assign(o,{e:"s"}));
+const PL_ES=[
+  {w:"brush",pic:"🖌️"},{w:"box",pic:"📦"},{w:"fox",pic:"🦊"},{w:"bus",pic:"🚌"},{w:"glass",pic:"🥛"},{w:"watch",pic:"⌚"}
+].map(o=>Object.assign(o,{e:"es"}));
+const PL_ROUNDS=10;let pl={list:[],i:0,n:2,locked:false};
+function startPlurals(){
+  pl.list=shuffle(shuffle(PL_S).slice(0,5).concat(shuffle(PL_ES).slice(0,5)));pl.i=0;showPlural();
+}
+function showPlural(){
+  pl.locked=false;
+  const it=pl.list[pl.i];pl.n=2+Math.floor(Math.random()*3);
+  document.getElementById("plOnePic").innerHTML=it.pic;
+  document.getElementById("plOneWord").textContent=`one ${it.w}`;
+  document.getElementById("plManyPic").innerHTML=Array.from({length:pl.n},()=>it.pic).join("");
+  document.getElementById("plManyWord").innerHTML=`${NUMW[pl.n]} ${it.w}<span class="blank" id="plBlank">?</span>`;
+  document.getElementById("plDots").innerHTML=Array.from({length:PL_ROUNDS},(_,k)=>`<span class="dot${k<pl.i?" done":""}"></span>`).join("");
+  sayPlural();
+}
+function sayPlural(){const it=pl.list[pl.i];if(it)speak(`One ${it.w}. ${cap(NUMW[pl.n])}...?`);}
+document.getElementById("plSay").onclick=sayPlural;
+document.getElementById("plOnePic").onclick=()=>{const it=pl.list[pl.i];speak(`one ${it.w}`);};
+document.querySelectorAll(".ending").forEach(btn=>btn.onclick=()=>{
+  ac();if(pl.locked)return;
+  const it=pl.list[pl.i],plural=it.w+it.e;
+  if(btn.dataset.end===it.e){
+    pl.locked=true;const bl=document.getElementById("plBlank");bl.textContent=it.e;bl.classList.add("ok");
+    ding();addStar();speak(`${cap(NUMW[pl.n])} ${plural}!`);
+    setTimeout(()=>{pl.i++;if(pl.i>=PL_ROUNDS)celebrate("Plural pro! 🍎🍎","s and es: you did it!",startPlurals);else showPlural();},1900);
+  }else{
+    boing();btn.classList.remove("shake");void btn.offsetWidth;btn.classList.add("shake");
+    speak(it.e==="es"?`Listen: ${it.w}... ${plural}. It's E S!`:`Listen: ${it.w}... ${plural}. It's S!`);
+  }
+});
+
+show();
+})();
+</script>
+</body>
+</html>
